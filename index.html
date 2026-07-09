@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#Lima Chat — Chatea por IRC con la comunidad de Lima, Perú</title>
+<meta name="description" content="Chatea en vivo en #Lima por IRC (red ChatZona). Normas, registro de nick, fotos de la comunidad, radio online, descargas y ayuda en un solo lugar.">
+<meta name="theme-color" content="#14141f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23e8472b'/%3E%3Ctext x='50' y='69' font-size='58' text-anchor='middle' fill='white' font-family='Georgia,serif' font-weight='700'%3E%23%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ---------- Tokens ---------- */
+:root{
+  --noche:#14141f;
+  --garua:#202637;
+  --garua-soft:#2a3146;
+  --coral:#e8472b;
+  --coral-soft:#ff6a48;
+  --oro:#e7b23a;
+  --arena:#f3ead9;
+  --text:#eef0f5;
+  --text-soft:#aab0c4;
+  --border:rgba(255,255,255,.09);
+  --radius:14px;
+  --maxw:1180px;
+  --font-display:'Fraunces',serif;
+  --font-body:'Work Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+
+/* ---------- Reset ---------- */
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--noche);
+  color:var(--text);
+  font-family:var(--font-body);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{display:block;max-width:100%;}
+a{color:inherit;text-decoration:none;}
+ul{margin:0;padding:0;}
+h1,h2,h3{font-family:var(--font-display);margin:0 0 .5em;line-height:1.15;font-weight:600;}
+p{margin:0 0 1em;color:var(--text-soft);}
+button{font-family:inherit;cursor:pointer;}
+:focus-visible{outline:2px solid var(--oro);outline-offset:2px;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.5rem;}
+[hidden]{display:none !important;}
+
+/* ---------- Header ---------- */
+header.site-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(20,20,31,.93);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.9rem 1.5rem;max-width:var(--maxw);margin:0 auto;gap:1rem;
+}
+.logo{display:flex;flex-direction:column;font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:.01em;}
+.logo span.hash{color:var(--coral);}
+.logo small{font-family:var(--font-mono);font-size:.62rem;color:var(--text-soft);font-weight:400;letter-spacing:.04em;text-transform:uppercase;}
+nav.main-nav ul{display:flex;gap:.3rem;flex-wrap:wrap;list-style:none;}
+nav.main-nav a{
+  display:flex;align-items:center;gap:.4rem;
+  padding:.5rem .8rem;border-radius:999px;
+  font-size:.86rem;font-weight:500;color:var(--text-soft);
+  border:1px solid transparent;transition:.15s;
+}
+nav.main-nav a:hover{color:var(--text);background:rgba(255,255,255,.06);}
+nav.main-nav a.active{color:var(--noche);background:var(--coral);font-weight:600;}
+nav.main-nav a svg{width:15px;height:15px;flex:none;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 0 rgba(74,222,128,.6);animation:pulse 1.8s infinite;}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(74,222,128,.55);}
+  70%{box-shadow:0 0 0 6px rgba(74,222,128,0);}
+  100%{box-shadow:0 0 0 0 rgba(74,222,128,0);}
+}
+.menu-btn{display:none;flex-direction:column;gap:4px;background:none;border:none;padding:.4rem;}
+.menu-btn span{width:22px;height:2px;background:var(--text);border-radius:2px;}
+
+@media (max-width:900px){
+  nav.main-nav{
+    position:fixed;inset:64px 0 0 0;background:var(--noche);
+    padding:1rem 1.5rem;transform:translateY(-110%);transition:.25s ease;
+    overflow-y:auto;
+  }
+  nav.main-nav.open{transform:translateY(0);}
+  nav.main-nav ul{flex-direction:column;gap:.2rem;}
+  nav.main-nav a{padding:.85rem 1rem;font-size:1rem;border-bottom:1px solid var(--border);border-radius:0;}
+  .menu-btn{display:flex;}
+}
+
+/* ---------- Ticker ---------- */
+.ticker{background:var(--garua);border-bottom:1px solid var(--border);overflow:hidden;padding:.5rem 0;}
+.ticker-track{display:flex;width:max-content;white-space:nowrap;animation:scroll 32s linear infinite;}
+.ticker-track span{font-family:var(--font-mono);font-size:.8rem;color:var(--text-soft);padding-right:3rem;}
+.ticker-track span b{color:var(--oro);font-weight:600;}
+@keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media (prefers-reduced-motion:reduce){
+  .ticker-track{animation:none;overflow-x:auto;}
+  html{scroll-behavior:auto;}
+}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,var(--noche) 0%,#3a2240 42%,var(--coral) 75%,var(--oro) 100%);
+  padding:4.5rem 1.5rem 0;
+}
+.hero::before{
+  content:"";position:absolute;top:8%;right:8%;width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,rgba(231,178,58,.55),transparent 70%);filter:blur(6px);pointer-events:none;
+}
+.hero-inner{max-width:var(--maxw);margin:0 auto;position:relative;z-index:2;padding-bottom:7rem;}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--oro);margin-bottom:.9rem;display:inline-flex;align-items:center;gap:.5rem;}
+.hero h1{font-size:clamp(2.1rem,5vw,3.5rem);max-width:18ch;color:#fff;}
+.hero p.lead{max-width:54ch;font-size:1.05rem;color:rgba(255,255,255,.86);}
+.btn-row{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:1.6rem;}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.5rem;border-radius:999px;font-weight:600;font-size:.95rem;border:1px solid transparent;transition:.15s;}
+.btn-primary{background:var(--noche);color:#fff;}
+.btn-primary:hover{background:#000;}
+.btn-secondary{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.45);}
+.btn-secondary:hover{background:rgba(255,255,255,.2);}
+.skyline{position:absolute;left:0;right:0;bottom:0;width:100%;height:90px;z-index:1;}
+.skyline-fill{fill:var(--noche);}
+
+/* ---------- Generic section layout ---------- */
+main.page{padding:4rem 1.5rem 5rem;}
+.section-head{max-width:62ch;margin-bottom:2.2rem;}
+.section-head .eyebrow{color:var(--coral);}
+.section-head h2{font-size:clamp(1.6rem,3.4vw,2.3rem);color:#fff;}
+.section-head p{font-size:1.02rem;}
+
+/* rule chips */
+.chip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:2.5rem 0;}
+.chip{background:var(--garua);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;}
+.chip svg{width:26px;height:26px;color:var(--coral);margin-bottom:.6rem;}
+.chip h3{font-size:1.02rem;color:#fff;margin-bottom:.3rem;}
+.chip p{margin:0;font-size:.9rem;}
+
+/* about + info card */
+.about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:2.5rem;align-items:start;margin-top:1rem;}
+@media (max-width:800px){.about-grid{grid-template-columns:1fr;}}
+.info-card{background:var(--garua);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;font-family:var(--font-mono);font-size:.85rem;}
+.info-card .row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px dashed var(--border);}
+.info-card .row:last-child{border-bottom:none;}
+.info-card .row b{color:var(--oro);font-weight:500;}
+
+/* teaser cards */
+.teaser-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:2.5rem;}
+.teaser-card{background:var(--garua-soft);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;}
+.teaser-card svg{width:28px;height:28px;color:var(--oro);margin-bottom:.7rem;}
+.teaser-card h3{color:#fff;font-size:1.1rem;}
+.teaser-card a.more{color:var(--coral-soft);font-weight:600;font-size:.9rem;}
+
+/* card generic */
+.card{background:var(--garua);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem;}
+
+/* CHAT */
+.chat-toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem;margin-bottom:1rem;font-family:var(--font-mono);font-size:.82rem;color:var(--text-soft);}
+.chat-toolbar a{color:var(--oro);font-weight:600;}
+.chat-frame-wrap{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);min-height:72vh;background:#0c0c14;}
+.chat-frame-wrap iframe{width:100%;height:72vh;border:0;display:block;}
+.chat-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);color:var(--text-soft);font-size:.9rem;background:#0c0c14;}
+.chat-tip{margin-top:1rem;font-size:.92rem;}
+.chat-tip a{color:var(--coral-soft);font-weight:600;}
+@media (max-width:700px){.chat-frame-wrap,.chat-frame-wrap iframe{min-height:80vh;height:80vh;}}
+
+/* NORMAS */
+.rules-list{list-style:none;counter-reset:rule;display:flex;flex-direction:column;gap:1.1rem;margin:1.5rem 0 2rem;}
+.rules-list li{counter-increment:rule;display:grid;grid-template-columns:auto 1fr;gap:1rem;background:var(--garua);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem 1.4rem;}
+.rules-list li::before{content:counter(rule);font-family:var(--font-display);font-size:1.6rem;color:var(--coral);font-weight:700;}
+.rules-list h3{color:#fff;font-size:1.05rem;margin-bottom:.25rem;}
+.rules-list p{margin:0;}
+.note{border-left:3px solid var(--oro);background:var(--garua-soft);padding:1rem 1.2rem;border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem;}
+
+/* REGISTRO */
+.steps{display:flex;flex-direction:column;gap:1.4rem;margin:1.5rem 0 2rem;}
+.step{display:grid;grid-template-columns:auto 1fr;gap:1rem;}
+.step .num{width:34px;height:34px;border-radius:50%;background:var(--coral);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:var(--font-mono);flex:none;}
+.step h3{color:#fff;font-size:1rem;margin-bottom:.4rem;}
+.code-box{background:#0d0d14;border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;font-family:var(--font-mono);font-size:.85rem;color:var(--arena);overflow-x:auto;}
+.code-box b{color:var(--oro);}
+
+/* FOTOS */
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin:1.5rem 0 2rem;}
+.photo-card{aspect-ratio:1/1;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1rem;gap:.6rem;border:1px solid var(--border);}
+.photo-card svg{width:30px;height:30px;opacity:.85;}
+.photo-card span{font-size:.78rem;color:rgba(255,255,255,.85);}
+.photo-card:nth-child(1){background:linear-gradient(150deg,#3a2240,var(--coral));}
+.photo-card:nth-child(2){background:linear-gradient(150deg,var(--garua),var(--oro));}
+.photo-card:nth-child(3){background:linear-gradient(150deg,var(--coral),var(--garua-soft));}
+.photo-card:nth-child(4){background:linear-gradient(150deg,var(--oro),#3a2240);}
+.photo-card:nth-child(5){background:linear-gradient(150deg,var(--garua-soft),var(--coral-soft));}
+.photo-card:nth-child(6){background:linear-gradient(150deg,#3a2240,var(--garua));}
+.cta-box{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;background:var(--garua);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem 1.5rem;}
+
+/* RADIO */
+.radio-card{display:flex;flex-direction:column;gap:1rem;}
+audio{width:100%;}
+.radio-form{display:flex;gap:.6rem;flex-wrap:wrap;}
+.radio-form input{flex:1;min-width:200px;background:#0d0d14;border:1px solid var(--border);border-radius:8px;padding:.7rem 1rem;color:var(--text);font-family:var(--font-mono);font-size:.85rem;}
+.radio-status{font-size:.85rem;color:var(--text-soft);font-family:var(--font-mono);}
+.station-list{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem;}
+.station-list li a{display:flex;justify-content:space-between;padding:.7rem 1rem;background:var(--garua-soft);border-radius:8px;font-size:.9rem;}
+.station-list li a:hover{background:rgba(255,255,255,.1);}
+
+/* DESCARGAS */
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem;margin-top:1.5rem;}
+.dl-card{display:flex;flex-direction:column;gap:.5rem;}
+.dl-card h3{color:#fff;font-size:1.05rem;margin:0;}
+.dl-card .tag{font-family:var(--font-mono);font-size:.72rem;color:var(--oro);text-transform:uppercase;letter-spacing:.05em;}
+.dl-card .btn{align-self:flex-start;margin-top:.4rem;}
+
+/* AYUDA */
+details{background:var(--garua);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.3rem;margin-bottom:.8rem;}
+summary{cursor:pointer;font-weight:600;color:#fff;font-size:.98rem;}
+details p{margin-top:.7rem;margin-bottom:0;}
+
+/* CONTACTO */
+.contact-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;}
+@media (max-width:800px){.contact-grid{grid-template-columns:1fr;}}
+form.contact-form{display:flex;flex-direction:column;gap:1rem;}
+.field{display:flex;flex-direction:column;gap:.4rem;}
+.field label{font-size:.85rem;color:var(--text-soft);}
+.field input,.field select,.field textarea{
+  background:#0d0d14;border:1px solid var(--border);border-radius:8px;
+  padding:.75rem 1rem;color:var(--text);font-family:var(--font-body);font-size:.95rem;
+}
+.field textarea{resize:vertical;min-height:120px;}
+.contact-form .btn{align-self:flex-start;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);background:var(--garua);padding:3rem 1.5rem 2rem;margin-top:2rem;}
+.footer-grid{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:2rem;}
+@media (max-width:800px){.footer-grid{grid-template-columns:1fr;gap:2rem;}}
+.footer-grid h4{color:#fff;font-size:.85rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.8rem;}
+.footer-grid ul{list-style:none;display:flex;flex-direction:column;gap:.5rem;}
+.footer-grid a{color:var(--text-soft);font-size:.9rem;}
+.footer-grid a:hover{color:#fff;}
+.footer-bottom{max-width:var(--maxw);margin:2.5rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--text-soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#inicio" class="logo"><span><span class="hash">#</span>LIMA</span><small>Chat IRC · Perú</small></a>
+    <nav class="main-nav" id="mainNav">
+      <ul>
+        <li><a href="#inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Inicio</a></li>
+        <li><a href="#chat"><span class="live-dot"></span>Chat</a></li>
+        <li><a href="#normas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5z"/><path d="M9 9h6M9 13h6"/></svg>Normas</a></li>
+        <li><a href="#registro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M5 21c0-4 3-6 7-6s7 2 7 6"/></svg>Registro</a></li>
+        <li><a href="#fotos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-5-4-4 3-3-2-4 3"/></svg>Fotos</a></li>
+        <li><a href="#radio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="14" r="4"/><path d="M3 14h2M19 14h2M12 2v2M5 5l1.5 1.5M19 5l-1.5 1.5"/></svg>Radio</a></li>
+        <li><a href="#descargas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M5 19h14"/></svg>Descargas</a></li>
+        <li><a href="#ayuda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7"/><path d="M12 17h.01"/></svg>Ayuda</a></li>
+        <li><a href="#contacto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Contacto</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span><b>Topic #Lima:</b> Bienvenidos a #LIMA — Un espacio para compartir, debatir y disfrutar de todo lo peruano. Normas: respeto ante todo (cero insultos o ataques) · no spam / flood / publicidad · la sala NO es de sexo.</span>
+    <span><b>Topic #Lima:</b> Bienvenidos a #LIMA — Un espacio para compartir, debatir y disfrutar de todo lo peruano. Normas: respeto ante todo (cero insultos o ataques) · no spam / flood / publicidad · la sala NO es de sexo.</span>
+  </div>
+</div>
+
+<main id="content">
+<!-- ===================== INICIO ===================== -->
+<section id="inicio" class="page">
+  <div class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">● en vivo por IRC · red ChatZona</span>
+      <h1>El punto de encuentro de los limeños en internet</h1>
+      <p class="lead">#Lima es una sala de chat por IRC para compartir, debatir y disfrutar de todo lo peruano: música, fútbol, comida, noticias y conversación de toda la vida, sin necesidad de registrarte para entrar.</p>
+      <div class="btn-row">
+        <a href="#chat" class="btn btn-primary">Entrar al chat →</a>
+        <a href="#normas" class="btn btn-secondary">Leer las normas</a>
+      </div>
+    </div>
+    <svg class="skyline" viewBox="0 0 1200 90" preserveAspectRatio="none" aria-hidden="true">
+      <g class="skyline-fill">
+        <rect x="0" y="40" width="60" height="50"/>
+        <rect x="55" y="20" width="14" height="70"/>
+        <rect x="90" y="55" width="80" height="35"/>
+        <rect x="175" y="30" width="40" height="60"/>
+        <rect x="220" y="50" width="100" height="40"/>
+        <rect x="330" y="15" width="10" height="75"/>
+        <rect x="345" y="45" width="70" height="45"/>
+        <rect x="430" y="35" width="55" height="55"/>
+        <circle cx="500" cy="34" r="9"/>
+        <rect x="495" y="34" width="10" height="56"/>
+        <rect x="520" y="50" width="120" height="40"/>
+        <rect x="650" y="25" width="35" height="65"/>
+        <rect x="690" y="50" width="90" height="40"/>
+        <rect x="790" y="40" width="50" height="50"/>
+        <rect x="845" y="20" width="12" height="70"/>
+        <rect x="862" y="55" width="100" height="35"/>
+        <rect x="970" y="35" width="45" height="55"/>
+        <rect x="1020" y="50" width="80" height="40"/>
+        <rect x="1110" y="30" width="40" height="60"/>
+        <rect x="1160" y="55" width="40" height="35"/>
+        <path d="M0 90 Q 150 75 300 88 T 600 85 T 900 88 T 1200 84 V90 H0 Z" opacity=".7"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="page-inner wrap" style="padding-top:2.5rem;">
+    <div class="chip-grid">
+      <div class="chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21c0-4-3.5-6-8-6s-8 2-8 6"/><circle cx="12" cy="7" r="4"/></svg>
+        <h3>Respeto ante todo</h3>
+        <p>Cero insultos ni ataques personales entre usuarios.</p>
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        <h3>Sin spam ni publicidad</h3>
+        <p>Nada de flood, mensajes repetidos o anuncios no solicitados.</p>
+      </div>
+      <div class="chip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M5 19L19 5"/></svg>
+        <h3>No es sala de sexo</h3>
+        <p>El canal es de conversación general, no de contenido sexual.</p>
+      </div>
+    </div>
+
+    <div class="about-grid">
+      <div>
+        <h2 style="color:#fff;font-size:1.6rem;">Sobre la sala</h2>
+        <p>#Lima funciona dentro de la red de servidores IRC de ChatZona. Puedes entrar desde el navegador con el chat integrado en esta página, o usando tu cliente IRC favorito desde el computador o el celular. No se necesita cuenta ni registro previo: eliges un nick y entras directo a la conversación.</p>
+        <p>Esta web es un proyecto independiente de la comunidad del canal, pensado para que sea fácil encontrar el chat, las normas, ayuda y todo lo relacionado a #Lima en un solo lugar.</p>
+      </div>
+      <div class="info-card">
+        <div class="row"><span>Red</span><b>ChatZona</b></div>
+        <div class="row"><span>Servidor</span><b>irc.chatzona.org</b></div>
+        <div class="row"><span>Puerto</span><b>6667 · SSL 6697</b></div>
+        <div class="row"><span>Canal</span><b>#Lima</b></div>
+        <div class="row"><span>Registro</span><b>no obligatorio</b></div>
+      </div>
+    </div>
+
+    <div class="teaser-grid">
+      <a class="teaser-card" href="#fotos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M21 17l-5-4-4 3-3-2-4 3"/></svg>
+        <h3>Fotos de la comunidad</h3>
+        <p>Capturas y momentos divertidos compartidos por la gente del canal.</p>
+        <span class="more">Ver galería →</span>
+      </a>
+      <a class="teaser-card" href="#radio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="14" r="4"/><path d="M3 14h2M19 14h2M12 2v2M5 5l1.5 1.5M19 5l-1.5 1.5"/></svg>
+        <h3>Radio online</h3>
+        <p>Pon música de fondo mientras chateas, directo desde la página.</p>
+        <span class="more">Escuchar radio →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CHAT ===================== -->
+<section id="chat" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">chat en vivo</span>
+      <h2>Sala #Lima</h2>
+      <p>Chatea directamente aquí, sin instalar nada. Si el chat no carga en este navegador, usa el enlace para abrirlo en una pestaña nueva.</p>
+    </div>
+    <div class="chat-toolbar">
+      <span>irc.chatzona.org · #Lima · puerto 6667 (6697 SSL)</span>
+      <a id="openNewTab" href="https://kiwiirc.com/client/irc.chatzona.org/?nick=Invitado??#Lima" target="_blank" rel="noopener">Abrir en una pestaña nueva ↗</a>
+    </div>
+    <div class="chat-frame-wrap">
+      <div class="chat-loading" id="chatLoading">Cargando chat…</div>
+      <iframe id="chatFrame" title="Chat IRC #Lima" data-src="https://kiwiirc.com/client/irc.chatzona.org/?nick=Invitado??#Lima" allow="fullscreen"></iframe>
+    </div>
+    <p class="chat-tip">Consejo: elige un nick que no esté usando nadie más. Si quieres quedarte siempre con el mismo, aprende a <a href="#registro">registrarlo aquí</a>.</p>
+    <noscript><p>Tu navegador no tiene JavaScript activado. Puedes entrar directamente desde <a href="https://kiwiirc.com/client/irc.chatzona.org/?#Lima" target="_blank" rel="noopener">este enlace</a>.</p></noscript>
+  </div>
+</section>
+
+<!-- ===================== NORMAS ===================== -->
+<section id="normas" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">topic oficial</span>
+      <h2>Normas de #Lima</h2>
+      <p>Bienvenidos a #LIMA: un espacio para compartir, debatir y disfrutar de todo lo peruano. Estas son las tres reglas base del canal, vigentes para todas las personas que entran a chatear.</p>
+    </div>
+    <ol class="rules-list">
+      <li><div><h3>Respeto ante todo</h3><p>Cero insultos, ataques personales, burlas pesadas o discriminación hacia otros usuarios. Se puede debatir fuerte, pero sin faltar el respeto.</p></div></li>
+      <li><div><h3>Nada de spam, flood o publicidad</h3><p>No se permite repetir mensajes, inundar el canal con texto, ni promocionar otros canales, webs o servicios sin permiso.</p></div></li>
+      <li><div><h3>La sala no es de sexo</h3><p>#Lima es un canal de conversación general, no un espacio para contenido sexual ni para buscar pareja o cibersexo.</p></div></li>
+    </ol>
+    <div class="note">Los operadores del canal (identificados con @ delante del nick) son quienes hacen cumplir estas normas. Incumplirlas puede llevar a una advertencia, expulsión temporal (kick) o baneo del canal.</div>
+  </div>
+</section>
+
+<!-- ===================== REGISTRO ===================== -->
+<section id="registro" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">protege tu identidad</span>
+      <h2>Registro de nick</h2>
+      <p>Registrar tu nick evita que otra persona lo use mientras estás desconectado y te permite identificarte cada vez que entras al chat.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div><h3>Conéctate con el nick que quieres usar</h3><p>Entra al <a href="#chat" style="color:var(--coral-soft);font-weight:600;">chat de #Lima</a> escribiendo el nombre que quieras registrar.</p></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div><h3>Regístralo con NickServ</h3><p>Escribe el siguiente comando en el chat, cambiando la contraseña y el correo por los tuyos:</p>
+          <div class="code-box">/msg NickServ REGISTER <b>tu_contraseña</b> <b>tu_correo@ejemplo.com</b></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div><h3>Confirma por correo (si te lo piden)</h3><p>Algunas redes envían un código de verificación. Si te llega uno, confírmalo así:</p>
+          <div class="code-box">/msg NickServ CONFIRM <b>código</b></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div><h3>Identifícate cada vez que entres</h3><p>La próxima vez que te conectes con tu nick registrado:</p>
+          <div class="code-box">/msg NickServ IDENTIFY <b>tu_contraseña</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="note">Estos son los comandos estándar de la mayoría de redes IRC. Si en ChatZona la sintaxis es distinta, escribe <strong>/msg NickServ HELP</strong> dentro del chat para ver las instrucciones exactas de la red.</div>
+  </div>
+</section>
+
+<!-- ===================== FOTOS ===================== -->
+<section id="fotos" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">comunidad</span>
+      <h2>Fotos y momentos de #Lima</h2>
+      <p>Capturas, anécdotas y momentos divertidos que la gente del canal va compartiendo. Esta galería se va llenando con lo que la propia comunidad envía.</p>
+    </div>
+    <!-- Para el administrador: reemplaza cada .photo-card por una <img> real cuando tengas capturas que subir -->
+    <div class="gallery">
+      <div class="photo-card"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1-2h4l1 2"/></svg><span>Espacio reservado para tu captura</span></div>
+      <div class="photo-card"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1-2h4l1 2"/></svg><span>Sube la primera foto del canal</span></div>
+      <div class="photo-card"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1-2h4l1 2"/></svg><span>Momentos divertidos, próximamente</span></div>
+      <div class="photo-card"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1-2h4l1 2"/></svg><span>Anécdotas de la sala</span></div>
+      <div class="photo-card"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1-2h4l1 2"/></svg><span>Reuniones de la comunidad</span></div>
+      <div class="photo-card"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M9 6l1-2h4l1 2"/></svg><span>Captura tu mejor chiste del chat</span></div>
+    </div>
+    <div class="cta-box">
+      <div><strong style="color:#fff;">¿Tienes una captura graciosa de #Lima?</strong><p style="margin:.3rem 0 0;">Compártela y la agregamos a la galería.</p></div>
+      <a href="#contacto" class="btn btn-primary" style="background:var(--coral);">Enviar mi foto</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== RADIO ===================== -->
+<section id="radio" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">música de fondo</span>
+      <h2>Radio online</h2>
+      <p>Escucha radio mientras chateas. Pega la URL de transmisión directa (mp3 o aac) de tu emisora favorita y dale play, o entra directo a una de las emisoras peruanas más escuchadas.</p>
+    </div>
+    <div class="card radio-card">
+      <audio id="radioPlayer" controls></audio>
+      <p class="radio-status" id="radioStatus">Sin emisora cargada todavía.</p>
+      <form class="radio-form" id="radioForm">
+        <input type="url" id="radioUrl" placeholder="https://streaming.tuemisora.com/radio.mp3" required>
+        <button type="submit" class="btn btn-primary" style="background:var(--coral);">Reproducir</button>
+      </form>
+      <p style="font-size:.82rem;margin:0;">Los navegadores bloquean el autoplay con sonido: si no empieza solo, pulsa el botón de play del reproductor.</p>
+    </div>
+    <h3 style="color:#fff;margin-top:2.2rem;">Emisoras peruanas populares</h3>
+    <p>Estas abren la web oficial de cada emisora en una pestaña nueva (no todas permiten conexión directa al archivo de audio):</p>
+    <ul class="station-list">
+      <li><a href="https://rpp.pe/" target="_blank" rel="noopener">RPP Noticias <span>↗</span></a></li>
+      <li><a href="https://audioplayer.pe/studio92" target="_blank" rel="noopener">Studio 92 <span>↗</span></a></li>
+      <li><a href="https://felicidad.com.pe/" target="_blank" rel="noopener">Radio Felicidad <span>↗</span></a></li>
+      <li><a href="https://www.ondacero.pe/" target="_blank" rel="noopener">Onda Cero <span>↗</span></a></li>
+      <li><a href="https://exitosanoticias.pe/" target="_blank" rel="noopener">Radio Exitosa <span>↗</span></a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== DESCARGAS ===================== -->
+<section id="descargas" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">clientes irc</span>
+      <h2>Descargas</h2>
+      <p>Para chatear desde la web no necesitas instalar nada, pero si prefieres un cliente dedicado, aquí tienes las opciones más usadas.</p>
+    </div>
+    <div class="dl-grid">
+      <div class="card dl-card">
+        <span class="tag">Windows</span>
+        <h3>mIRC</h3>
+        <p>El cliente IRC clásico, ligero y muy usado en redes hispanas desde los años 90.</p>
+        <a class="btn btn-primary" style="background:var(--coral);" href="https://www.mirc.com/" target="_blank" rel="noopener">Descargar ↗</a>
+      </div>
+      <div class="card dl-card">
+        <span class="tag">Windows · macOS · Linux</span>
+        <h3>HexChat</h3>
+        <p>Cliente gratuito, con interfaz moderna y soporte para temas y scripts.</p>
+        <a class="btn btn-primary" style="background:var(--coral);" href="https://hexchat.github.io/" target="_blank" rel="noopener">Descargar ↗</a>
+      </div>
+      <div class="card dl-card">
+        <span class="tag">Android</span>
+        <h3>AndroIRC</h3>
+        <p>Cliente IRC para Android, con funciones similares a mIRC desde el celular.</p>
+        <a class="btn btn-primary" style="background:var(--coral);" href="https://play.google.com/store/search?q=AndroIRC&c=apps" target="_blank" rel="noopener">Buscar en Play Store ↗</a>
+      </div>
+      <div class="card dl-card">
+        <span class="tag">Cualquier navegador</span>
+        <h3>Kiwi IRC (web)</h3>
+        <p>El mismo chat integrado en esta página, sin instalar nada, también accesible aparte.</p>
+        <a class="btn btn-primary" style="background:var(--coral);" href="https://kiwiirc.com/client/irc.chatzona.org/?#Lima" target="_blank" rel="noopener">Abrir ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== AYUDA ===================== -->
+<section id="ayuda" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">preguntas frecuentes</span>
+      <h2>Ayuda</h2>
+      <p>Respuestas rápidas a las dudas más comunes sobre el chat. Si no encuentras lo que buscas, escríbenos en <a href="#contacto" style="color:var(--coral-soft);font-weight:600;">contacto</a>.</p>
+    </div>
+    <details>
+      <summary>¿Cómo cambio mi nick?</summary>
+      <p>Escribe <code>/nick NuevoNombre</code> en cualquier momento dentro del chat. Si tu nick está registrado, identifícate después con NickServ.</p>
+    </details>
+    <details>
+      <summary>No puedo conectarme al chat, ¿qué hago?</summary>
+      <p>Prueba recargar la página, revisa tu conexión a internet, o usa el enlace para abrir el chat en una pestaña nueva desde la sección Chat. Algunas redes corporativas o de colegio bloquean el puerto de IRC.</p>
+    </details>
+    <details>
+      <summary>¿Qué significan los símbolos antes de un nick (@, +, ~)?</summary>
+      <p><code>@</code> indica operador del canal, <code>+</code> indica voz (puede hablar en salas moderadas) y <code>~</code> suele indicar al fundador del canal. Son roles, no insultos.</p>
+    </details>
+    <details>
+      <summary>¿Cómo evito que me hagan flood o spam?</summary>
+      <p>Puedes ignorar a un usuario con <code>/ignore nick</code> en la mayoría de clientes, o pedirle a un operador (@) que tome acción si el comportamiento incumple las normas.</p>
+    </details>
+    <details>
+      <summary>¿Cómo reporto a alguien que rompe las normas?</summary>
+      <p>Avisa a un operador del canal (nick con @ delante) directamente en el chat, o escríbenos por la sección de <a href="#contacto">contacto</a> con detalles de lo ocurrido.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ===================== CONTACTO ===================== -->
+<section id="contacto" class="page" hidden>
+  <div class="wrap" style="padding-top:2.5rem;">
+    <div class="section-head">
+      <span class="eyebrow">hablemos</span>
+      <h2>Contacto</h2>
+      <p>Dudas, sugerencias o reportes sobre el canal #Lima. Completa el formulario y se abrirá tu correo con el mensaje listo para enviar.</p>
+    </div>
+    <div class="contact-grid">
+      <form class="contact-form" id="contactForm">
+        <div class="field"><label for="cName">Nombre</label><input id="cName" type="text" required></div>
+        <div class="field"><label for="cEmail">Correo</label><input id="cEmail" type="email" required></div>
+        <div class="field"><label for="cSubject">Asunto</label>
+          <select id="cSubject">
+            <option>Soporte técnico</option>
+            <option>Reportar a un usuario</option>
+            <option>Sugerencia para el canal</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field"><label for="cMessage">Mensaje</label><textarea id="cMessage" required></textarea></div>
+        <button type="submit" class="btn btn-primary" style="background:var(--coral);">Enviar mensaje</button>
+      </form>
+      <div class="info-card" style="font-family:var(--font-body);font-size:.95rem;">
+        <p style="margin-bottom:1rem;color:var(--text);"><strong>Correo:</strong><br><span style="font-family:var(--font-mono);color:var(--oro);">contacto@canal-lima.pe</span></p>
+        <p style="margin-bottom:0;color:var(--text);">También puedes hablar directamente con cualquier operador del canal (nick con <code>@</code> delante) dentro del <a href="#chat" style="color:var(--coral-soft);font-weight:600;">chat de #Lima</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="logo" style="margin-bottom:.6rem;"><span><span class="hash">#</span>LIMA</span></div>
+      <p style="max-width:32ch;">El punto de encuentro de los limeños por IRC. Comunidad independiente, hecha por y para la gente del canal.</p>
+    </div>
+    <div>
+      <h4>Navegación</h4>
+      <ul>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#chat">Chat</a></li>
+        <li><a href="#normas">Normas</a></li>
+        <li><a href="#registro">Registro de nick</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Recursos</h4>
+      <ul>
+        <li><a href="#fotos">Fotos</a></li>
+        <li><a href="#radio">Radio online</a></li>
+        <li><a href="#descargas">Descargas</a></li>
+        <li><a href="#ayuda">Ayuda</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year"></span> #Lima Chat — proyecto independiente de la comunidad, no afiliado oficialmente a ChatZona.org</span>
+    <span>irc.chatzona.org · #Lima</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var pages = document.querySelectorAll('section.page');
+  var navLinks = document.querySelectorAll('.main-nav a');
+  var validIds = Array.prototype.map.call(pages, function(p){return p.id;});
+
+  function route(){
+    var id = (location.hash || '#inicio').replace('#','');
+    if(validIds.indexOf(id) === -1){ id = 'inicio'; }
+    pages.forEach(function(p){ p.hidden = (p.id !== id); });
+    navLinks.forEach(function(a){
+      a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+    });
+    if(id === 'chat'){ loadChat(); }
+    window.scrollTo(0,0);
+    document.getElementById('mainNav').classList.remove('open');
+  }
+
+  var chatLoaded = false;
+  function loadChat(){
+    if(chatLoaded) return;
+    var frame = document.getElementById('chatFrame');
+    var loading = document.getElementById('chatLoading');
+    frame.addEventListener('load', function(){ if(loading) loading.style.display = 'none'; });
+    frame.src = frame.dataset.src;
+    chatLoaded = true;
+  }
+
+  window.addEventListener('hashchange', route);
+  document.addEventListener('DOMContentLoaded', route);
+
+  var menuBtn = document.getElementById('menuBtn');
+  var mainNav = document.getElementById('mainNav');
+  menuBtn.addEventListener('click', function(){
+    var open = mainNav.classList.toggle('open');
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+
+  var radioForm = document.getElementById('radioForm');
+  if(radioForm){
+    radioForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var url = document.getElementById('radioUrl').value.trim();
+      var player = document.getElementById('radioPlayer');
+      var status = document.getElementById('radioStatus');
+      if(!url) return;
+      player.src = url;
+      player.play().then(function(){
+        status.textContent = 'Reproduciendo: ' + url;
+      }).catch(function(){
+        status.textContent = 'Emisora cargada. Pulsa play en el reproductor para escucharla.';
+      });
+    });
+  }
+
+  var contactForm = document.getElementById('contactForm');
+  if(contactForm){
+    contactForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = document.getElementById('cName').value;
+      var email = document.getElementById('cEmail').value;
+      var subject = document.getElementById('cSubject').value;
+      var message = document.getElementById('cMessage').value;
+      var body = 'Nombre: ' + name + '\nCorreo: ' + email + '\n\n' + message;
+      var mailto = 'mailto:contacto@canal-lima.pe?subject=' + encodeURIComponent('[#Lima] ' + subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = mailto;
+    });
+  }
+
+  var yearEl = document.getElementById('year');
+  if(yearEl){ yearEl.textContent = new Date().getFullYear(); }
+})();
+</script>
+</body>
+</html>
