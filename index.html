@@ -469,29 +469,54 @@ footer{border-top:1px solid var(--border);background:var(--garua);padding:3rem 1
 <section id="radio" class="page" hidden>
   <div class="wrap" style="padding-top:2.5rem;">
     <div class="section-head">
-      <span class="eyebrow">música de fondo</span>
-      <h2>Radio online</h2>
-      <p>Escucha radio mientras chateas. Pega la URL de transmisión directa (mp3 o aac) de tu emisora favorita y dale play, o entra directo a una de las emisoras peruanas más escuchadas.</p>
+      <span class="eyebrow">🎧 En vivo las 24 horas</span>
+      <h2>Radio Ultrasonix</h2>
+      <p>Escucha Radio Ultrasonix mientras navegas por la página.</p>
     </div>
+
     <div class="card radio-card">
-      <audio id="radioPlayer" controls></audio>
-      <p class="radio-status" id="radioStatus">Sin emisora cargada todavía.</p>
-      <form class="radio-form" id="radioForm">
-        <input type="url" id="radioUrl" placeholder="https://sonicpanel.totalstreaming.net:10989/stream" required>
-        <button type="submit" class="btn btn-primary" style="background:var(--coral);">Reproducir</button>
-      </form>
-      <p style="font-size:.82rem;margin:0;">Los navegadores bloquean el autoplay con sonido: si no empieza solo, pulsa el botón de play del reproductor.</p>
+      <audio
+        id="radioPlayer"
+        controls
+        autoplay
+        preload="auto"
+      >
+        <source src="https://sonicpanel.totalstreaming.net:10989/stream" type="audio/mpeg">
+        Tu navegador no soporta audio HTML5.
+      </audio>
+
+      <p class="radio-status" id="radioStatus">
+        🎵 Radio Ultrasonix - En vivo
+      </p>
+
+      <button
+        class="btn btn-primary"
+        style="background:var(--coral);"
+        onclick="document.getElementById('radioPlayer').play();">
+        ▶ Reproducir
+      </button>
+
+      <p style="font-size:.82rem;margin-top:1rem;">
+        Si la reproducción no inicia automáticamente, presiona el botón <strong>Reproducir</strong> o ▶ del reproductor. Algunos navegadores bloquean el inicio automático con sonido.
+      </p>
     </div>
-    <h3 style="color:#fff;margin-top:2.2rem;">Emisoras peruanas populares</h3>
-    <p>Estas abren la web oficial de cada emisora en una pestaña nueva (no todas permiten conexión directa al archivo de audio):</p>
-    <ul class="station-list">
-      <li><a href="https://rpp.pe/" target="_blank" rel="noopener">RPP Noticias <span>↗</span></a></li>
-      <li><a href="https://audioplayer.pe/studio92" target="_blank" rel="noopener">Studio 92 <span>↗</span></a></li>
-      <li><a href="https://felicidad.com.pe/" target="_blank" rel="noopener">Radio Felicidad <span>↗</span></a></li>
-      <li><a href="https://www.ondacero.pe/" target="_blank" rel="noopener">Onda Cero <span>↗</span></a></li>
-      <li><a href="https://exitosanoticias.pe/" target="_blank" rel="noopener">Radio Exitosa <span>↗</span></a></li>
-    </ul>
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const player = document.getElementById("radioPlayer");
+
+      player.volume = 1;
+
+      const intento = player.play();
+
+      if (intento !== undefined) {
+        intento.catch(() => {
+          console.log("El navegador bloqueó la reproducción automática.");
+        });
+      }
+    });
+  </script>
 </section>
 
 <!-- ===================== DESCARGAS ===================== -->
